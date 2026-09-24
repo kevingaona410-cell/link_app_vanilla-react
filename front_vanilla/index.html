@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <!-- Metadatos y recursos del documento -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Wikinguin</title>
+        <meta
+            name="description"
+            content="Recursos y enlaces para aprender y descubrir nuevos conocimientos."
+        >
+
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="icon" type="image/webp" href="assets/logo.webp">
+    </head>
+
+    <body>
+        <!-- Encabezado y navegación principal -->
+        <header>
+            <nav aria-label="Navegación principal">
+                <a href="index.html" class="brand">
+                    <img
+                        src="assets/logo.webp"
+                        alt=""
+                        width="40"
+                        height="40"
+                    >
+                    <span>Wikinguin</span>
+                </a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Vista principal con el listado de recursos -->
+            <section id="links-view" aria-labelledby="links-title">
+                <h1 id="links-title">Recursos para aprender</h1>
+                <p>Descubre enlaces seleccionados para ampliar tus conocimientos.</p>
+
+                <!-- Los recursos se generan dinámicamente con JavaScript -->
+                <div
+                    id="links-list"
+                    aria-live="polite"
+                    aria-busy="true"
+                ></div>
+            </section>
+
+            <!-- Vista de detalle, oculta hasta seleccionar un recurso -->
+            <section
+                id="link-detail"
+                aria-labelledby="link-detail-title"
+                hidden
+            >
+                <button id="back-button" type="button">
+                    ← Volver
+                </button>
+
+                <h2 id="link-detail-title">Detalle del recurso</h2>
+
+                <!-- Contenido generado dinámicamente con JavaScript -->
+                <div id="link-detail-content"></div>
+            </section>
+        </main>
+
+        <!-- Lógica de carga, renderizado y navegación -->
+        <script src="js/app.js" defer></script>
+    </body>
+    </html>

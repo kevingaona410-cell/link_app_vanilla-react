@@ -28,11 +28,12 @@ function errorHandler(error, req, res, next) {
     });
 }
 
+// Permite indicar el método HTTP mediante el parámetro _method.
 app.use(methodOverride('_method'));
 
 app.use(errorHandler);
 
-// Iniciar servidor
+// Conecta la base de datos antes de iniciar el servidor.
 async function startServer() {
     try {
         await connectDB();

@@ -1,3 +1,4 @@
+// Crea errores con el estado HTTP que consumirá el middleware global.
 function createNotFound(resource) {
     const error = new Error(`${resource} no encontrado`);
     error.status = 404;

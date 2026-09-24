@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema(
     {
+        // Cada comentario referencia el link al que pertenece.
         link: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Link',
@@ -18,6 +19,7 @@ const commentSchema = new mongoose.Schema(
             trim: true
         }
     },
+    // Mongoose gestiona automáticamente createdAt y updatedAt.
     { timestamps: true }
 );
 

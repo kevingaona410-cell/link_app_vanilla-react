@@ -19,6 +19,7 @@ const linkSchema = new mongoose.Schema(
             trim: true
         },
 
+        // Las etiquetas y los votos usan valores iniciales vacíos.
         tags: {
             type: [String],
             default: []
@@ -29,6 +30,7 @@ const linkSchema = new mongoose.Schema(
             default: 0
         },
 
+        // Guarda la fecha usada para ordenar los links.
         createdAt: {
             type: Date,
             default: Date.now

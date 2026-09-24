@@ -7,6 +7,7 @@ async function getLinks(req, res, next) {
     try {
         const { tag } = req.query;
 
+        // Filtra por etiqueta cuando se recibe y ordena del más nuevo al más antiguo.
         const filter = tag ? { tags: tag } : {};
 
         const links = await Link.find(filter)
@@ -21,6 +22,7 @@ async function getLinks(req, res, next) {
 // controlador para obtener un link especifico GET /api/links/:id
 async function getLink(req, res, next) {
     try {
+        // Un ID inválido se trata como un link inexistente.
         if (!mongoose.isValidObjectId(req.params.id)) {
             return next(createNotFound('Link'));
         }
@@ -55,6 +57,7 @@ async function updateLink(req, res, next) {
             return next(createNotFound('Link'));
         }
 
+        // Devuelve el link actualizado y aplica las validaciones del esquema.
         const link = await Link.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -102,6 +105,7 @@ async function voteLink(req, res, next) {
             return next(createNotFound('Link'));
         }
 
+        // Incrementa los votos de forma atómica mediante $inc.
         const link = await Link.findByIdAndUpdate(
             req.params.id,
             { $inc: { votes: 1 } },

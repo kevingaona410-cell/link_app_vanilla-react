@@ -1,9 +1,10 @@
-// Intalacion de la Base de Datos Mongoose
 const mongoose = require('mongoose');
 
+// Comprueba la configuración y conecta con MongoDB.
 async function connectDB() {
     const mongoURI = process.env.MONGODB_URI
 
+    // Falla rápido si falta la variable de conexión.
     if (!mongoURI) {
         throw new Error('MONGODB_URI is not defined');
     }
