@@ -37,6 +37,18 @@
                 <h1 id="links-title">Recursos para aprender</h1>
                 <p>Descubre enlaces seleccionados para ampliar tus conocimientos.</p>
 
+                <!-- Control para filtrar los links por una etiqueta -->
+                <form id="filter-form">
+                    <label for="tag-filter">Filtrar por etiqueta</label>
+                    <input
+                        id="tag-filter"
+                        name="tag"
+                        type="search"
+                        placeholder="Ej. javascript"
+                    >
+                    <button type="submit">Filtrar</button>
+                </form>
+
                 <!-- Los recursos se generan dinámicamente con JavaScript -->
                 <div
                     id="links-list"
@@ -62,7 +74,8 @@
             </section>
         </main>
 
-        <!-- Lógica de carga, renderizado y navegación -->
+        <!-- Peticiones a la API y lógica de la aplicación -->
+        <script src="js/api.js" defer></script>
         <script src="js/app.js" defer></script>
     </body>
     </html>
