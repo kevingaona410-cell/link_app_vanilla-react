@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getLinkById, getLinks } from './api'
+import { getLinkById, getLinks, voteLink } from './api'
 import LinkDetail from './components/LinkDetail'
 import LinkList from './components/LinkList'
 import TagFilter from './components/TagFilter'
@@ -18,6 +18,10 @@ function App() {
   const [selectedLink, setSelectedLink] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState('')
+
+  // Estado compartido para bloquear los votos y mostrar errores.
+  const [votingId, setVotingId] = useState('')
+  const [voteError, setVoteError] = useState('')
 
   // Normaliza el texto para buscar sin distinguir mayúsculas.
   const normalizedFilter = filter.trim().toLocaleLowerCase()
@@ -52,6 +56,7 @@ function App() {
   async function handleSelectLink(id) {
     setSelectedLink(null)
     setDetailError('')
+    setVoteError('')
     setDetailLoading(true)
 
     try {
@@ -64,10 +69,41 @@ function App() {
     }
   }
 
+  // Actualiza el mismo voto en el listado y en el detalle actual.
+  async function handleVote(id) {
+    if (votingId) return
+
+    setVotingId(id)
+    setVoteError('')
+
+    try {
+      const updatedLink = await voteLink(id)
+
+      setLinks((currentLinks) =>
+        currentLinks.map((link) =>
+          link._id === id
+            ? { ...link, votes: updatedLink.votes }
+            : link
+        )
+      )
+
+      setSelectedLink((currentLink) =>
+        currentLink?._id === id
+          ? { ...currentLink, votes: updatedLink.votes }
+          : currentLink
+      )
+    } catch {
+      setVoteError('No se pudo registrar el voto.')
+    } finally {
+      setVotingId('')
+    }
+  }
+
   // Regresa al listado y limpia el estado del detalle.
   function handleBack() {
     setSelectedLink(null)
     setDetailError('')
+    setVoteError('')
   }
 
   // Muestra la vista correspondiente al estado actual.
@@ -77,7 +113,13 @@ function App() {
 
       {/* El estado determina si mostramos el detalle o el listado. */}
       {selectedLink ? (
-        <LinkDetail link={selectedLink} onBack={handleBack} />
+        <LinkDetail
+          link={selectedLink}
+          onBack={handleBack}
+          onVote={handleVote}
+          isVoting={votingId === selectedLink._id}
+          voteError={voteError}
+        />
       ) : detailLoading ? (
         <p>Cargando detalle...</p>
       ) : detailError ? (
@@ -90,8 +132,15 @@ function App() {
           <TagFilter value={filter} onChange={setFilter} />
           {loading && <p>Cargando links...</p>}
           {error && <p role="alert">{error}</p>}
+          {voteError && <p role="alert">{voteError}</p>}
           {!loading && !error && (
-            <LinkList links={visibleLinks} onSelect={handleSelectLink} />
+            <LinkList
+              links={visibleLinks}
+              onSelect={handleSelectLink}
+              onVote={handleVote}
+              votingId={votingId}
+              onTagClick={setFilter}
+            />
           )}
         </>
       )}
