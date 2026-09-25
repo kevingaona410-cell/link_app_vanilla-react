@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getLinkById, getLinks, voteLink } from './api'
+import { createLink, getLinkById, getLinks, voteLink } from './api'
+import CreateLinkForm from './components/CreateLinkForm'
 import LinkDetail from './components/LinkDetail'
 import LinkList from './components/LinkList'
 import TagFilter from './components/TagFilter'
@@ -51,6 +52,12 @@ function App() {
 
     loadLinks()
   }, [])
+
+  // Crea un link y lo coloca al inicio del estado local.
+  async function handleCreateLink(data) {
+    const newLink = await createLink(data)
+    setLinks((currentLinks) => [newLink, ...currentLinks])
+  }
 
   // Consulta el link seleccionado y activa la vista de detalle.
   async function handleSelectLink(id) {
@@ -130,18 +137,23 @@ function App() {
       ) : (
         <>
           <TagFilter value={filter} onChange={setFilter} />
-          {loading && <p>Cargando links...</p>}
-          {error && <p role="alert">{error}</p>}
-          {voteError && <p role="alert">{voteError}</p>}
-          {!loading && !error && (
-            <LinkList
-              links={visibleLinks}
-              onSelect={handleSelectLink}
-              onVote={handleVote}
-              votingId={votingId}
-              onTagClick={setFilter}
-            />
-          )}
+          <div className="content-grid">
+            <CreateLinkForm onCreate={handleCreateLink} />
+            <div className="links-column">
+              {loading && <p>Cargando links...</p>}
+              {error && <p role="alert">{error}</p>}
+              {voteError && <p role="alert">{voteError}</p>}
+              {!loading && !error && (
+                <LinkList
+                  links={visibleLinks}
+                  onSelect={handleSelectLink}
+                  onVote={handleVote}
+                  votingId={votingId}
+                  onTagClick={setFilter}
+                />
+              )}
+            </div>
+          </div>
         </>
       )}
     </main>
