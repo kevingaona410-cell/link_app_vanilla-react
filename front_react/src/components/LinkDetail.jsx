@@ -71,7 +71,10 @@ function LinkDetail({ link, onBack, onVote, isVoting, voteError }) {
           loading={commentsLoading}
           error={commentsError}
         />
-        <CommentForm onSubmit={handleCreateComment} submitting={submitting} />
+        {/* Evita enviar mientras todavía se carga la lista inicial. */}
+        {!commentsLoading && (
+          <CommentForm onSubmit={handleCreateComment} submitting={submitting} />
+        )}
       </section>
     </section>
   )
