@@ -1,24 +1,17 @@
 # Wikinguin
 
-Wikinguin es una aplicación para organizar y compartir enlaces de aprendizaje. El proyecto incluye una implementación SPA con JavaScript Vanilla y otra con React, ambas conectadas a la misma API REST.
+Aplicación para guardar, filtrar y compartir enlaces de aprendizaje. Incluye una versión Vanilla JS y otra React, conectadas al mismo backend.
 
-## Estructura
+## Ejecutar el proyecto
 
-```text
-backend/       API REST, modelos y MongoDB
-front_vanilla/ Implementación SPA con JavaScript puro
-front_react/   Implementación React con componentes
-docs/          Requisitos del challenge
-```
-
-## Requisitos
+### Requisitos
 
 - Node.js 20.19 o superior.
 - npm.
-- MongoDB local en el puerto `27100`, usando la base `link_manager`.
-- Backend en el puerto `3000`.
+- MongoDB local en `localhost:27100`, base `link_manager`.
+- Python para servir Vanilla estáticamente.
 
-## Ejecutar el backend
+### 1. Backend
 
 Desde la raíz del proyecto:
 
@@ -41,15 +34,11 @@ npm install
 npm run dev
 ```
 
-API base:
+API disponible en `http://localhost:3000/api/links`.
 
-```text
-http://localhost:3000/api/links
-```
+### 2. Frontend Vanilla
 
-## Ejecutar Vanilla
-
-Vanilla no necesita instalación de dependencias, pero debe servirse mediante un servidor estático:
+En otra terminal, desde la raíz:
 
 ```powershell
 Set-Location .\front_vanilla
@@ -58,9 +47,9 @@ python -m http.server 5174
 
 Abre `http://localhost:5174`.
 
-## Ejecutar React
+### 3. Frontend React
 
-En otra terminal:
+En otra terminal, desde la raíz:
 
 ```powershell
 Set-Location .\front_react
@@ -68,35 +57,22 @@ npm install
 npm run dev
 ```
 
-Abre la dirección indicada por Vite, normalmente `http://localhost:5173`.
+Abre la dirección que indique Vite, normalmente `http://localhost:5173`.
 
-## API
+## Carpetas
 
-| Método | Ruta | Función |
-|---|---|---|
-| `GET` | `/api/links` | Listar links |
-| `GET` | `/api/links?tag=javascript` | Filtrar por etiqueta |
-| `GET` | `/api/links/:id` | Obtener detalle |
-| `POST` | `/api/links` | Crear link |
-| `PUT` | `/api/links/:id` | Actualizar link |
-| `DELETE` | `/api/links/:id` | Eliminar link |
-| `POST` | `/api/links/:id/vote` | Votar |
-| `GET` | `/api/links/:id/comments` | Listar comentarios |
-| `POST` | `/api/links/:id/comments` | Crear comentario |
+- `backend/`: API REST, conexión con MongoDB, modelos y controladores.
+- `front_vanilla/`: primera versión SPA usando JavaScript y DOM.
+- `front_react/`: versión SPA usando React, Vite y componentes reutilizables.
 
-No hay autenticación. Los autores de los comentarios se escriben manualmente.
+## Comandos útiles
 
-## Funcionalidades
+Backend:
 
-- Listado y filtro local por etiquetas.
-- Etiquetas visibles y utilizables.
-- Creación de links.
-- Vista de detalle.
-- Votación desde el listado y el detalle.
-- Consulta y creación de comentarios.
-- Navegación SPA entre listado y detalle.
-
-## Validación
+```powershell
+Set-Location .\backend
+npm start
+```
 
 React:
 
@@ -104,24 +80,24 @@ React:
 Set-Location .\front_react
 npm run lint
 npm run build
+npm run preview
 ```
 
-Backend:
+## API rápida
 
-```powershell
-Set-Location .\backend
-node --check app.js
-```
+- `GET /api/links`
+- `GET /api/links/:id`
+- `POST /api/links`
+- `PUT /api/links/:id`
+- `DELETE /api/links/:id`
+- `POST /api/links/:id/vote`
+- `GET /api/links/:id/comments`
+- `POST /api/links/:id/comments`
 
-No hay framework de pruebas automatizadas configurado; la validación funcional se realiza contra la API y los frontends con el backend local.
+No existe autenticación; los autores de comentarios se escriben manualmente.
 
-## Git y despliegue
+## Git y configuración
 
 - `.env`, `node_modules`, builds y logs están excluidos por `.gitignore`.
-- Revisa los cambios antes de subirlos con `git status`.
-- Para desplegar, configura `MONGODB_URI`, `PORT` y CORS en el servidor.
-- Ejecuta `npm run build` en React y sirve `front_react/dist/` como archivos estáticos.
-- Para Vanilla, sirve `front_vanilla/` como archivos estáticos.
-- Cambia la URL local de la API en ambos frontends antes de construir para producción.
-
-La documentación específica de React está en [`front_react/README.md`](front_react/README.md).
+- Revisa los cambios con `git status` antes de subirlos.
+- Para producción, cambia la URL de la API en ambos frontends antes de construir.
