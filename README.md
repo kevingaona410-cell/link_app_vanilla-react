@@ -1,102 +1,66 @@
 # Wikinguin
 
-Wikinguin es una aplicación para organizar, guardar y descubrir enlaces de aprendizaje. El challenge pide construir la misma idea dos veces: primero con JavaScript Vanilla para entender la lógica y luego con React usando componentes reutilizables.
-
-## Stack
-
-- Node.js
-- Express
-- MongoDB y Mongoose
-- CORS
-- dotenv
-- Nodemon
-- JavaScript Vanilla
-- React y Vite
-- Oxlint
+Wikinguin es una aplicación para organizar y compartir enlaces de aprendizaje. El proyecto incluye una implementación SPA con JavaScript Vanilla y otra con React, ambas conectadas a la misma API REST.
 
 ## Estructura
 
 ```text
-.
-├── backend/                 API REST, modelos y conexión a MongoDB
-├── docs/challenge.md        Requisitos del challenge
-├── front_vanilla/           Implementación SPA con JavaScript puro
-├── front_react/             Implementación React con componentes
-└── README.md
+backend/       API REST, modelos y MongoDB
+front_vanilla/ Implementación SPA con JavaScript puro
+front_react/   Implementación React con componentes
+docs/          Requisitos del challenge
 ```
 
 ## Requisitos
 
 - Node.js 20.19 o superior.
 - npm.
-- MongoDB local, usando la base `link_manager` y el puerto `27100`.
-- Puertos locales: `3000` para el backend y `5173` o `5174` para los frontends.
+- MongoDB local en el puerto `27100`, usando la base `link_manager`.
+- Backend en el puerto `3000`.
 
-## Configuración del backend
+## Ejecutar el backend
 
-1. Abrir una terminal en la raíz del proyecto.
-2. Crear el archivo de entorno local:
+Desde la raíz del proyecto:
 
-   ```powershell
-   Set-Location .\backend
-   Copy-Item .env.example .env
-   ```
+```powershell
+Set-Location .\backend
+Copy-Item .env.example .env
+```
 
-3. Editar `backend/.env` con la configuración local:
+Configura `backend/.env`:
 
-   ```env
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27100/link_manager
-   ```
+```env
+PORT=3000
+MONGODB_URI=mongodb://localhost:27100/link_manager
+```
 
-4. Instalar dependencias:
+Instala y ejecuta:
 
-   ```powershell
-   npm install
-   ```
+```powershell
+npm install
+npm run dev
+```
 
-5. Iniciar el servidor de desarrollo:
-
-   ```powershell
-   npm run dev
-   ```
-
-El servidor quedará disponible en:
+API base:
 
 ```text
 http://localhost:3000/api/links
 ```
 
-Para ejecutar el backend sin Nodemon:
-
-```powershell
-npm start
-```
-
-El archivo `.env` contiene configuración local y no debe subirse a Git. La plantilla segura es `backend/.env.example`.
-
 ## Ejecutar Vanilla
 
-La versión Vanilla no requiere instalación de dependencias. Debe servirse mediante un servidor estático para que el navegador pueda cargar JavaScript y consumir la API.
-
-Desde la raíz del proyecto:
+Vanilla no necesita instalación de dependencias, pero debe servirse mediante un servidor estático:
 
 ```powershell
 Set-Location .\front_vanilla
 python -m http.server 5174
 ```
 
-Abrir:
-
-```text
-http://localhost:5174
-```
-
-También puede usarse cualquier servidor estático equivalente. No es recomendable abrir `index.html` directamente con doble clic.
+Abre `http://localhost:5174`.
 
 ## Ejecutar React
 
-En otra terminal, desde la raíz del proyecto:
+En otra terminal:
 
 ```powershell
 Set-Location .\front_react
@@ -104,99 +68,37 @@ npm install
 npm run dev
 ```
 
-Abrir la dirección que indique Vite, normalmente:
+Abre la dirección indicada por Vite, normalmente `http://localhost:5173`.
 
-```text
-http://localhost:5173
-```
+## API
 
-El backend debe estar ejecutándose antes de abrir cualquiera de los dos frontends.
-
-## API REST
-
-La URL base local es:
-
-```text
-http://localhost:3000/api/links
-```
-
-| Método | Ruta | Uso |
+| Método | Ruta | Función |
 |---|---|---|
 | `GET` | `/api/links` | Listar links |
-| `GET` | `/api/links?tag=javascript` | Filtrar por tag en el backend |
-| `GET` | `/api/links/:id` | Obtener un link |
-| `POST` | `/api/links` | Crear un link |
-| `PUT` | `/api/links/:id` | Actualizar un link |
-| `DELETE` | `/api/links/:id` | Eliminar un link |
-| `POST` | `/api/links/:id/vote` | Sumar un voto |
+| `GET` | `/api/links?tag=javascript` | Filtrar por etiqueta |
+| `GET` | `/api/links/:id` | Obtener detalle |
+| `POST` | `/api/links` | Crear link |
+| `PUT` | `/api/links/:id` | Actualizar link |
+| `DELETE` | `/api/links/:id` | Eliminar link |
+| `POST` | `/api/links/:id/vote` | Votar |
 | `GET` | `/api/links/:id/comments` | Listar comentarios |
 | `POST` | `/api/links/:id/comments` | Crear comentario |
 
-### Crear un link
-
-```json
-{
-  "title": "Documentación de MDN",
-  "url": "https://developer.mozilla.org/",
-  "description": "Recursos para aprender JavaScript.",
-  "tags": ["javascript", "frontend"]
-}
-```
-
-### Crear un comentario
-
-```json
-{
-  "author": "Nombre",
-  "content": "Comentario sobre el recurso."
-}
-```
-
-No existe autenticación ni gestión de usuarios. Los autores de comentarios se escriben manualmente.
+No hay autenticación. Los autores de los comentarios se escriben manualmente.
 
 ## Funcionalidades
 
-- Listado de links.
-- Filtro por etiquetas.
-- Etiquetas visibles en las tarjetas.
+- Listado y filtro local por etiquetas.
+- Etiquetas visibles y utilizables.
 - Creación de links.
 - Vista de detalle.
 - Votación desde el listado y el detalle.
 - Consulta y creación de comentarios.
 - Navegación SPA entre listado y detalle.
-- Dos implementaciones: Vanilla y React.
-
-La versión Vanilla realiza el filtro localmente para permitir coincidencias parciales sin distinguir mayúsculas. La API también conserva el filtro exacto mediante `?tag=`.
-
-## Comandos de desarrollo
-
-### Backend
-
-```powershell
-Set-Location .\backend
-npm run dev
-```
-
-### React
-
-```powershell
-Set-Location .\front_react
-npm run dev
-npm run lint
-npm run build
-npm run preview
-```
-
-### Vanilla
-
-```powershell
-Set-Location .\front_vanilla
-python -m http.server 5174
-```
 
 ## Validación
 
-Para validar el frontend React:
+React:
 
 ```powershell
 Set-Location .\front_react
@@ -204,40 +106,22 @@ npm run lint
 npm run build
 ```
 
-Para validar la sintaxis del backend:
+Backend:
 
 ```powershell
 Set-Location .\backend
 node --check app.js
 ```
 
-El repositorio no tiene un framework de pruebas automatizadas configurado. Las pruebas funcionales se realizan contra la API y desde cada frontend con el backend local.
+No hay framework de pruebas automatizadas configurado; la validación funcional se realiza contra la API y los frontends con el backend local.
 
-## Git y archivos sensibles
+## Git y despliegue
 
-El `.gitignore` raíz excluye `node_modules`, archivos `.env`, logs, builds y archivos temporales. Antes de crear un commit se debe revisar el estado:
+- `.env`, `node_modules`, builds y logs están excluidos por `.gitignore`.
+- Revisa los cambios antes de subirlos con `git status`.
+- Para desplegar, configura `MONGODB_URI`, `PORT` y CORS en el servidor.
+- Ejecuta `npm run build` en React y sirve `front_react/dist/` como archivos estáticos.
+- Para Vanilla, sirve `front_vanilla/` como archivos estáticos.
+- Cambia la URL local de la API en ambos frontends antes de construir para producción.
 
-```powershell
-git status
-```
-
-Nunca se deben subir `backend/.env`, credenciales de MongoDB ni `node_modules`.
-
-## Despliegue
-
-### Backend
-
-1. Configurar `MONGODB_URI` y `PORT` mediante variables de entorno del servidor.
-2. Ejecutar `npm install` o `npm ci` en `backend`.
-3. Iniciar con `npm start` o con un gestor de procesos.
-4. Configurar CORS para el dominio del frontend.
-
-### Frontends
-
-1. Ejecutar `npm run build` en `front_react` para generar `front_react/dist/`.
-2. Servir `dist/` mediante un servidor estático.
-3. Cambiar la URL de la API en `front_react/src/api.js` y en `front_vanilla/js/api.js` para apuntar al backend desplegado.
-4. Reconstruir React después de cambiar la URL.
-5. Servir `front_vanilla` como archivos estáticos.
-
-El despliegue es opcional para el challenge, pero el README incluye los pasos básicos para preparar ambas versiones.
+La documentación específica de React está en [`front_react/README.md`](front_react/README.md).
