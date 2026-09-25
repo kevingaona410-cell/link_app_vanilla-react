@@ -10,7 +10,6 @@ const backButton = document.getElementById('back-button');
 const createLinkForm = document.getElementById('create-link-form');
 const createLinkMessage = document.getElementById('create-link-message');
 
-// Espera a que el usuario deje de escribir antes de filtrar.
 let filterTimer;
 
 // Conserva los links recibidos para filtrar sin repetir peticiones.
@@ -207,7 +206,7 @@ function renderLinkDetail(link) {
     authorInput.id = 'comment-author';
     authorInput.name = 'author';
     authorInput.required = true;
-    authorInput.placeholder = 'Tu nombre';
+    authorInput.placeholder = 'Nombre';
     authorInput.type = 'text';
 
     contentLabel.htmlFor = 'comment-content';
@@ -215,7 +214,7 @@ function renderLinkDetail(link) {
     contentInput.id = 'comment-content';
     contentInput.name = 'content';
     contentInput.required = true;
-    contentInput.placeholder = 'Escribe tu comentario...';
+    contentInput.placeholder = 'Escribe un comentario.';
 
     submitButton.type = 'submit';
     submitButton.textContent = 'Enviar comentario';
@@ -318,6 +317,7 @@ function showLinkDetailView() {
 function showLinksView() {
     linkDetail.hidden = true;
     linksView.hidden = false;
+    filterLinks(tagFilter.value.trim());
 }
 
 // Filtra los links al enviar el formulario.
