@@ -14,6 +14,8 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+// Permite indicar el método HTTP mediante el parámetro _method.
+app.use(methodOverride('_method'));
 
 // Rutas
 app.use('/api/links', linkRoutes);
@@ -28,8 +30,6 @@ function errorHandler(error, req, res, next) {
     });
 }
 
-// Permite indicar el método HTTP mediante el parámetro _method.
-app.use(methodOverride('_method'));
 
 app.use(errorHandler);
 
