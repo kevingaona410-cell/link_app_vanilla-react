@@ -49,6 +49,48 @@
                     <button type="submit">Filtrar</button>
                 </form>
 
+                <!-- Formulario para guardar un nuevo recurso -->
+                <section aria-labelledby="create-title">
+                    <h2 id="create-title">Guardar nuevo recurso</h2>
+                    <form id="create-link-form">
+                        <label for="link-title">Título</label>
+                        <input
+                            id="link-title"
+                            name="title"
+                            type="text"
+                            placeholder="Ej. MDN Web Docs"
+                            required
+                        >
+
+                        <label for="link-url">URL</label>
+                        <input
+                            id="link-url"
+                            name="url"
+                            type="url"
+                            placeholder="https://..."
+                            required
+                        >
+
+                        <label for="link-description">Descripción</label>
+                        <textarea
+                            id="link-description"
+                            name="description"
+                            placeholder="Breve descripción del recurso"
+                        ></textarea>
+
+                        <label for="link-tags">Etiquetas (separadas por coma)</label>
+                        <input
+                            id="link-tags"
+                            name="tags"
+                            type="text"
+                            placeholder="javascript, css, recursos"
+                        >
+
+                        <button type="submit">Guardar link</button>
+                        <p id="create-link-message" aria-live="polite"></p>
+                    </form>
+                </section>
+
                 <!-- Los recursos se generan dinámicamente con JavaScript -->
                 <div
                     id="links-list"
