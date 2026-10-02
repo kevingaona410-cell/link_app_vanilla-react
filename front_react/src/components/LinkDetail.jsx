@@ -3,7 +3,7 @@ import { createComment, getComments } from '../api'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
 
-function LinkDetail({ link, onBack, onVote, isVoting, voteError }) {
+function LinkDetail({ link, onBack, onVote, isVoting, hasVoted, voteError }) {
   // Mantiene los comentarios y el estado de su formulario.
     const [comments, setComments] = useState([])
     const [commentsLoading, setCommentsLoading] = useState(true)
@@ -58,8 +58,12 @@ function LinkDetail({ link, onBack, onVote, isVoting, voteError }) {
 
         <div className="link-detail__vote">
             <p>Votos: {link.votes ?? 0}</p>
-            <button type="button" onClick={() => onVote(link._id)} disabled={isVoting}>
-            {isVoting ? 'Votando...' : 'Votar'}
+<button
+                type="button"
+                onClick={() => onVote(link._id)}
+                disabled={isVoting || hasVoted}
+            >
+                {hasVoted ? 'Ya votaste' : isVoting ? 'Votando...' : 'Votar'}
             </button>
             {voteError && <p role="alert">{voteError}</p>}
         </div>

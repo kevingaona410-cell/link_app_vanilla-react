@@ -1,4 +1,4 @@
-function LinkCard({ link, onSelect, onVote, isVoting, onTagClick }) {
+function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick }) {
   // Ejecuta el callback con el ID del link que se desea consultar.
   function handleSelect() {
     onSelect(link._id)
@@ -23,8 +23,13 @@ function LinkCard({ link, onSelect, onVote, isVoting, onTagClick }) {
         </ul>
       )}
       <div className="link-card__actions">
-        <button type="button" onClick={() => onVote(link._id)} disabled={isVoting}>
-          {isVoting ? 'Votando...' : 'Votar'}
+        {/* Deshabilita el botón si ya votó en esta sesión. */}
+        <button
+          type="button"
+          onClick={() => onVote(link._id)}
+          disabled={isVoting || hasVoted}
+        >
+          {hasVoted ? 'Ya votaste' : isVoting ? 'Votando...' : 'Votar'}
         </button>
         <button type="button" onClick={handleSelect}>
           Ver detalle

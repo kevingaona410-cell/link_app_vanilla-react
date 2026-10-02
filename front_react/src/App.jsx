@@ -19,6 +19,9 @@ import TagFilter from './components/TagFilter'
 // Importa los estilos específicos de App.
 import './App.css'
 
+// Guarda la clave de los votos realizados durante esta sesión del navegador.
+const VOTED_LINKS_STORAGE_KEY = 'wikinguin-voted-links'
+
 // Declara el componente principal de la aplicación React.
 function App() {
   // Conserva los links en un arreglo y sus funciones para actualizarlo.
@@ -52,6 +55,17 @@ function App() {
 
   // Guarda el mensaje de error producido al votar.
   const [voteError, setVoteError] = useState('')
+
+  // Recupera los IDs votados en esta pestaña, sin permitir almacenamiento persistente.
+  const [votedIds, setVotedIds] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(VOTED_LINKS_STORAGE_KEY)
+      const parsedIds = saved ? JSON.parse(saved) : []
+      return Array.isArray(parsedIds) ? parsedIds : []
+    } catch {
+      return []
+    }
+  })
 
   // Elimina espacios exteriores y convierte el filtro a minúsculas.
   const normalizedFilter = filter.trim().toLocaleLowerCase()
@@ -133,8 +147,8 @@ function App() {
 
   // Vota un link y sincroniza el resultado en las dos vistas.
   async function handleVote(id) {
-    // Si ya hay un voto en proceso, evita iniciar otro.
-    if (votingId) return
+    // Bloquea votos simultáneos o repetidos en la misma sesión.
+    if (votingId || votedIds.includes(id)) return
 
     // Guarda el ID que se está procesando.
     setVotingId(id)
@@ -161,6 +175,17 @@ function App() {
           ? { ...currentLink, votes: updatedLink.votes }
           : currentLink
       )
+
+      // Guarda el voto únicamente cuando el backend lo confirmó.
+      setVotedIds((currentIds) => {
+        const nextIds = [...currentIds, id]
+        try {
+          sessionStorage.setItem(VOTED_LINKS_STORAGE_KEY, JSON.stringify(nextIds))
+        } catch {
+          // Si el navegador bloquea sessionStorage, el estado de React sigue funcionando.
+        }
+        return nextIds
+      })
     } catch {
       // Guarda el error si el backend no acepta el voto.
       setVoteError('No se pudo registrar el voto.')
@@ -195,6 +220,7 @@ function App() {
           onBack={handleBack}
           onVote={handleVote}
           isVoting={votingId === selectedLink._id}
+          hasVoted={votedIds.includes(selectedLink._id)}
           voteError={voteError}
         />
       ) : detailLoading ? (
@@ -239,6 +265,7 @@ function App() {
                   onSelect={handleSelectLink}
                   onVote={handleVote}
                   votingId={votingId}
+                  votedIds={votedIds}
                   onTagClick={setFilter}
                 />
               )}
