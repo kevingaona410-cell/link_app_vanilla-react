@@ -83,6 +83,11 @@ function App() {
     // Sin filtro, el listado visible es el listado completo.
     : links
 
+
+  const sortedLinks =[...visibleLinks]
+    .sort((firstLink, secondLink) =>
+      (secondLink.votes ?? 0) - (firstLink.votes ?? 0))
+
   // Ejecuta esta lógica cuando App se monta por primera vez.
   useEffect(() => {
     // Declara la función asíncrona que carga los links.
@@ -275,7 +280,7 @@ function App() {
               {!loading && !error && (
                 /* Props: links, onSelect, onVote, votingId y onTagClick. */
                 <LinkList
-                  links={visibleLinks}
+                  links={sortedLinks}
                   onSelect={handleSelectLink}
                   onVote={handleVote}
                   votingId={votingId}
