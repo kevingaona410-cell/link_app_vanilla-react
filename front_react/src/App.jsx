@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 
 // Importa las funciones que se comunican con el backend.
-import { createLink, getLinkById, getLinks, voteLink } from './api'
+import { createLink, deleteLink, getLinkById, getLinks, voteLink} from './api'
 
 // Importa el formulario que crea links.
 import CreateLinkForm from './components/CreateLinkForm'
@@ -116,6 +116,20 @@ function App() {
 
     // Actualiza el estado usando la versión más reciente del arreglo.
     setLinks((currentLinks) => [newLink, ...currentLinks])
+  }
+
+  async function handleDeleteLink(id) {
+    const confirmed = window.confirm('seguro que desea eliminar este link?');
+
+    if (!confirmed) return;
+
+    try {
+      await deleteLink(id)
+
+      setLinks((currentLinks) => currentLinks.filter((link) => link._id !== id))
+    } catch {
+      setError('No se pudo eliminar el link')
+    }
   }
 
   // Consulta un link por su ID y activa la vista de detalle.
@@ -267,6 +281,7 @@ function App() {
                   votingId={votingId}
                   votedIds={votedIds}
                   onTagClick={setFilter}
+                  onDelete={handleDeleteLink}
                 />
               )}
             </div>

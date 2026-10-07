@@ -1,6 +1,6 @@
 import LinkCard from './LinkCard'
 
-function LinkList({ links, onSelect, onVote, votingId, votedIds, onTagClick }) {
+function LinkList({ links, onSelect, onVote, votingId, votedIds, onTagClick, onDelete }) {
   // Muestra un estado específico cuando no hay recursos.
   if (links.length === 0) {
     return <p>Todavía no hay links.</p>
@@ -18,6 +18,7 @@ function LinkList({ links, onSelect, onVote, votingId, votedIds, onTagClick }) {
           isVoting={votingId === link._id}
           hasVoted={votedIds.includes(link._id)}
           onTagClick={onTagClick}
+          onDelete={onDelete}
         />
       ))}
     </div>

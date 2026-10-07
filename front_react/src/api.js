@@ -80,6 +80,19 @@ async function createComment(id, data) {
     return response.json();
 }
 
+async function deleteLink(id) {
+
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE'});
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+
+    return response.json();
+
+    
+}
 
 export {
     getLinks,
@@ -87,5 +100,6 @@ export {
     createLink,
     voteLink,
     getComments,
-    createComment
+    createComment,
+    deleteLink
 };

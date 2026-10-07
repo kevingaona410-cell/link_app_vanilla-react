@@ -1,7 +1,11 @@
-function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick }) {
+function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick, onDelete }) {
   // Ejecuta el callback con el ID del link que se desea consultar.
   function handleSelect() {
     onSelect(link._id)
+  }
+
+  function handleDelete() {
+    onDelete(link._id)
   }
 
   return (
@@ -33,6 +37,10 @@ function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick }) {
         </button>
         <button type="button" onClick={handleSelect}>
           Ver detalle
+        </button>
+
+        <button type="button" onClick={handleDelete}>
+          Eliminar
         </button>
       </div>
     </article>
