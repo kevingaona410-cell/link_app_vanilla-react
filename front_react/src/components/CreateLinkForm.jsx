@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 
 function CreateLinkForm({ onCreate }) {
   // Controla los campos del formulario y su mensaje de estado.
@@ -8,7 +9,7 @@ function CreateLinkForm({ onCreate }) {
     description: '',
     tags: ''
   })
-  const [message, setMessage] = useState('')
+  
   const [submitting, setSubmitting] = useState(false)
 
   function handleChange(event) {
@@ -29,19 +30,18 @@ function CreateLinkForm({ onCreate }) {
       .filter(Boolean)
 
     if (!title || !url) {
-      setMessage('Título y URL son obligatorios.')
+      toast.error('Título y URL son obligatorios.')
       return
     }
 
     setSubmitting(true)
-    setMessage('')
 
     try {
       await onCreate({ title, url, description, tags })
       setFormData({ title: '', url: '', description: '', tags: '' })
-      setMessage('Link creado correctamente.')
+      toast.success('Link creado correctamente.')
     } catch {
-      setMessage('No se pudo crear el link.')
+      toast.error('No se pudo crear el link.')
     } finally {
       setSubmitting(false)
     }
@@ -90,7 +90,6 @@ function CreateLinkForm({ onCreate }) {
       <button type="submit" disabled={submitting}>
         {submitting ? 'Guardando...' : 'Guardar link'}
       </button>
-      {message && <p aria-live="polite">{message}</p>}
     </form>
   )
 }

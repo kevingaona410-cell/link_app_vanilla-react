@@ -1,65 +1,33 @@
-// Importa los hooks que permiten guardar estado y sincronizar React con la API.
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'   // Importa los hooks que permiten guardar estado y sincronizar React con la API.
+import { createLink, deleteLink, getLinkById, getLinks, voteLink} from './api' // Importa las funciones que se comunican con el backend.
 
-// Importa las funciones que se comunican con el backend.
-import { createLink, deleteLink, getLinkById, getLinks, voteLink} from './api'
-
-// Importa el formulario que crea links.
-import CreateLinkForm from './components/CreateLinkForm'
-
-// Importa la vista de detalle del link.
+// Importar los componentes hijos
+import CreateLinkForm from './components/CreateLinkForm' 
 import LinkDetail from './components/LinkDetail'
-
-// Importa el componente que recibe el arreglo y crea las tarjetas.
 import LinkList from './components/LinkList'
-
-// Importa el buscador de etiquetas.
 import TagFilter from './components/TagFilter'
 
 // Importa los estilos específicos de App.
 import './App.css'
-
-// Guarda la clave de los votos realizados durante esta sesión del navegador.
-const VOTED_LINKS_STORAGE_KEY = 'wikinguin-voted-links'
+import { toast } from 'react-toastify'
+import { ToastContainer } from 'react-toastify' // Importa el estilo para el toastify
+import 'react-toastify/dist/ReactToastify.css'
 
 // Declara el componente principal de la aplicación React.
 function App() {
-  // Conserva los links en un arreglo y sus funciones para actualizarlo.
-  // links guarda los datos y setLinks permite reemplazarlos o modificarlos.
-  const [links, setLinks] = useState([])
-
-  // Indica si la petición inicial de links todavía está en curso.
-  // loading cambia para que React muestre el mensaje de carga o el contenido.
-  const [loading, setLoading] = useState(true)
-
-  // Guarda el mensaje de error de la carga principal.
-  // error comienza vacío y se llena dentro de catch.
-  const [error, setError] = useState('')
-
-  // Guarda el texto que el usuario escribe en el filtro de etiquetas.
-  // filter se actualiza desde TagFilter mediante onChange.
-  const [filter, setFilter] = useState('')
-
-  // Guarda el link abierto actualmente en la vista de detalle.
-  // selectedLink determina si App muestra el detalle o el listado.
-  const [selectedLink, setSelectedLink] = useState(null)
-
-  // Indica que se está consultando el detalle de un link.
-  const [detailLoading, setDetailLoading] = useState(false)
-
-  // Guarda el error producido al consultar un detalle.
-  const [detailError, setDetailError] = useState('')
-
-  // Guarda el ID del link que se está voteando para bloquear el botón.
-  const [votingId, setVotingId] = useState('')
-
-  // Guarda el mensaje de error producido al votar.
-  const [voteError, setVoteError] = useState('')
+  const [links, setLinks] = useState([])    // Conserva los links en un arreglo y sus funciones para actualizarlo.
+  const [loading, setLoading] = useState(true)    // Indica si la petición inicial de links todavía está en curso.
+  const [error, setError] = useState('')    // Guarda el mensaje de error de la carga principal.
+  const [filter, setFilter] = useState('')      // Guarda el texto que el usuario escribe en el filtro de etiquetas.
+  const [selectedLink, setSelectedLink] = useState(null)      // Guarda el link abierto actualmente en la vista de detalle.
+  const [detailLoading, setDetailLoading] = useState(false)   // Indica que se está consultando el detalle de un link.
+  const [detailError, setDetailError] = useState('')      // Guarda el error producido al consultar un detalle.
+  const [votingId, setVotingId] = useState('')      // Guarda el ID del link que se está voteando para bloquear el botón.
 
   // Recupera los IDs votados en esta pestaña, sin permitir almacenamiento persistente.
   const [votedIds, setVotedIds] = useState(() => {
     try {
-      const saved = sessionStorage.getItem(VOTED_LINKS_STORAGE_KEY)
+      const saved = sessionStorage.getItem('wikinguin-voted-links')
       const parsedIds = saved ? JSON.parse(saved) : []
       return Array.isArray(parsedIds) ? parsedIds : []
     } catch {
@@ -67,6 +35,16 @@ function App() {
     }
   })
 
+
+  const [pinnedIds, setPinnedIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('wikinguin-pinned-links')
+      const parsed = saved ? JSON.parse(saved) : []
+      return Array.isArray(parsed) ? parsed : []    
+    } catch {
+      return []
+    }
+  })
   // Elimina espacios exteriores y convierte el filtro a minúsculas.
   const normalizedFilter = filter.trim().toLocaleLowerCase()
 
@@ -84,14 +62,16 @@ function App() {
     : links
 
 
-  const sortedLinks =[...visibleLinks]
-    .sort((firstLink, secondLink) =>
-      (secondLink.votes ?? 0) - (firstLink.votes ?? 0))
-
+  const sortedLinks = [...visibleLinks].sort((a, b) =>
+    (pinnedIds.includes(b._id) - pinnedIds.includes(a._id)) ||
+    ((b.votes ?? 0) - (a.votes ?? 0))
+)
   // Ejecuta esta lógica cuando App se monta por primera vez.
   useEffect(() => {
     // Declara la función asíncrona que carga los links.
     async function loadLinks() {
+      // Limpia el error anterior antes de reintentar.
+      setError('')
       // Intenta obtener los links desde la API.
       try {
         // Espera la respuesta JSON del backend.
@@ -102,6 +82,7 @@ function App() {
       } catch {
         // Si la API falla, guarda un mensaje para mostrarlo al usuario.
         setError('No se pudieron cargar los links.')
+        toast.error('No se pudieron cargar los links.')
       } finally {
         // La carga terminó, tanto con éxito como con error.
         setLoading(false)
@@ -132,8 +113,23 @@ function App() {
       await deleteLink(id)
 
       setLinks((currentLinks) => currentLinks.filter((link) => link._id !== id))
+      setPinnedIds((current) => {
+        const next = current.filter((pinnedId) => pinnedId !== id)
+        try {
+          localStorage.setItem('wikinguin-pinned-links', JSON.stringify(next))
+        } catch {}
+        return next
+      })
+      setVotedIds((current) => {
+        const next = current.filter((votedId) => votedId !== id)
+        try {
+          sessionStorage.setItem('wikinguin-voted-links', JSON.stringify(next))
+        } catch {}
+        return next
+      })
+      toast.success('Link borrado correctamente')
     } catch {
-      setError('No se pudo eliminar el link')
+      toast.error('No se pudo eliminar el link')
     }
   }
 
@@ -142,10 +138,8 @@ function App() {
     // Cierra el detalle anterior mientras carga el nuevo.
     setSelectedLink(null)
 
-    // Limpia errores de detalles y votos anteriores.
+    // Limpia el error de detalle anterior.
     setDetailError('')
-    setVoteError('')
-
     // Activa el estado de carga del detalle.
     setDetailLoading(true)
 
@@ -158,6 +152,7 @@ function App() {
     } catch {
       // Guarda el error si el link no puede consultarse.
       setDetailError('No se pudo cargar el link.')
+      toast.error('No se pudo cargar el link.')
     } finally {
       // Termina la carga del detalle.
       setDetailLoading(false)
@@ -172,8 +167,6 @@ function App() {
     // Guarda el ID que se está procesando.
     setVotingId(id)
 
-    // Limpia el error de voto anterior.
-    setVoteError('')
 
     try {
       // Envía el voto al backend y recibe el link actualizado.
@@ -199,7 +192,7 @@ function App() {
       setVotedIds((currentIds) => {
         const nextIds = [...currentIds, id]
         try {
-          sessionStorage.setItem(VOTED_LINKS_STORAGE_KEY, JSON.stringify(nextIds))
+          sessionStorage.setItem('wikinguin-voted-links', JSON.stringify(nextIds))
         } catch {
           // Si el navegador bloquea sessionStorage, el estado de React sigue funcionando.
         }
@@ -207,40 +200,73 @@ function App() {
       })
     } catch {
       // Guarda el error si el backend no acepta el voto.
-      setVoteError('No se pudo registrar el voto.')
+      toast.error('No se pudo registrar el voto.')
     } finally {
       // Libera el bloqueo del botón de voto.
       setVotingId('')
     }
   }
 
+  function handleTogglePin(id) {
+  setPinnedIds((current) => {
+    const isPinned = current.includes(id)
+    const next = isPinned
+      ? current.filter((pinnedId) => pinnedId !== id)
+      : [...current, id]
+    try {
+      localStorage.setItem('wikinguin-pinned-links', JSON.stringify(next))
+    } catch {}
+    return next
+  })
+  const isNowPinned = !pinnedIds.includes(id)
+  if (isNowPinned) toast.success('Link fijado 📌')
+  else toast.info('Link desfijado')
+}
+
   // Cierra el detalle y regresa al listado.
   function handleBack() {
     // Elimina el link seleccionado.
     setSelectedLink(null)
-
-    // Limpia errores de la vista anterior.
+    // Limpia el error del detalle anterior.
     setDetailError('')
-    setVoteError('')
   }
 
   // Devuelve el JSX que React dibuja en pantalla.
   return (
-    // Contenedor principal de la aplicación.
-    <main className="app">
-      {/* Título visible de Wikinguin. */}
-      <h1>Wikinguin</h1>
+    // Fragmento con encabezado y contenido principal.
+    <>
+      {/* Encabezado portado del frontend vanilla. */}
+      <header className="site-header">
+        <nav aria-label="Navegación principal" className="site-header__nav">
+          <a
+            href="#"
+            className="brand"
+            onClick={(event) => {
+              event.preventDefault()
+              handleBack()
+              setFilter('')
+            }}
+          >
+            <img src="/logo.webp" alt="Logo Wikinguin" width="40" height="40" />
+            <span>Wikinguin</span>
+          </a>
+        </nav>
+      </header>
+      {/* Contenedor principal de la aplicación. */}
+      <main className="app">
+        {/* Título visible, mismo texto que en vanilla. */}
+        <h1>Recursos para Pinguinos del Saber</h1>
+        <p className="app__subtitle">Revisa nuestro Directorio para ampliar tus conocimientos.</p>
 
       {/* El estado decide si se muestra el detalle o el listado. */}
       {selectedLink ? (
-        /* Props: link, onBack, onVote, isVoting y voteError. */
+        /* Props: link, onBack, onVote, isVoting y hasVoted. */
         <LinkDetail
           link={selectedLink}
           onBack={handleBack}
           onVote={handleVote}
           isVoting={votingId === selectedLink._id}
           hasVoted={votedIds.includes(selectedLink._id)}
-          voteError={voteError}
         />
       ) : detailLoading ? (
         /* Mensaje temporal mientras se consulta el detalle. */
@@ -273,14 +299,13 @@ function App() {
               {/* Mensaje de error de la carga inicial. */}
               {error && <p role="alert">{error}</p>}
 
-              {/* Mensaje de error de los votos. */}
-              {voteError && <p role="alert">{voteError}</p>}
-
               {/* Muestra el listado solo cuando no hay carga ni error. */}
               {!loading && !error && (
                 /* Props: links, onSelect, onVote, votingId y onTagClick. */
                 <LinkList
                   links={sortedLinks}
+                  pinnedIds={pinnedIds}
+                  onTogglePin={handleTogglePin}
                   onSelect={handleSelectLink}
                   onVote={handleVote}
                   votingId={votingId}
@@ -293,7 +318,10 @@ function App() {
           </div>
         </>
       )}
-    </main>
+
+      <ToastContainer position="top-right" autoClose={3000} />
+      </main>
+    </>
   )
 }
 

@@ -1,15 +1,16 @@
-function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick, onDelete }) {
+function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick, onDelete, isPinned, onTogglePin }) {
   // Ejecuta el callback con el ID del link que se desea consultar.
   function handleSelect() {
     onSelect(link._id)
   }
 
-  function handleDelete() {
-    onDelete(link._id)
+  async function handleDelete() {
+    await onDelete(link._id)
   }
 
   return (
-    <article className="link-card">
+    <article className={isPinned ? 'link-card link-card--pinned' : 'link-card'}>
+      {isPinned && <span className="pin-badge">📌 FIJADO</span>}
       <h2>{link.title}</h2>
       <a href={link.url} target="_blank" rel="noopener noreferrer">
         {link.url}
@@ -42,6 +43,11 @@ function LinkCard({ link, onSelect, onVote, isVoting, hasVoted, onTagClick, onDe
         <button type="button" onClick={handleDelete}>
           Eliminar
         </button>
+
+        <button type="button" onClick={() => onTogglePin(link._id)}>
+          {isPinned ? 'Desfijar 📌' : 'Fijar 📌'}
+        </button>
+
       </div>
     </article>
   )

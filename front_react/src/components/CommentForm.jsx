@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 
 function CommentForm({ onSubmit, submitting }) {
   // Controla los campos y valida antes de enviar un comentario.
   const [author, setAuthor] = useState('')
   const [content, setContent] = useState('')
-  const [error, setError] = useState('')
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -13,18 +13,18 @@ function CommentForm({ onSubmit, submitting }) {
     const cleanContent = content.trim()
 
     if (!cleanAuthor || !cleanContent) {
-      setError('Completa nombre y comentario.')
+      toast.error('Completa nombre y comentario.')
       return
     }
 
-    setError('')
 
     try {
       await onSubmit({ author: cleanAuthor, content: cleanContent })
       setAuthor('')
       setContent('')
+      toast.success('Comentario Publicado.')
     } catch {
-      setError('No se pudo crear el comentario.')
+      toast.error('No se pudo crear el comentario.')
     }
   }
 
@@ -50,7 +50,6 @@ function CommentForm({ onSubmit, submitting }) {
       <button type="submit" disabled={submitting}>
         {submitting ? 'Enviando...' : 'Enviar comentario'}
       </button>
-      {error && <p role="alert">{error}</p>}
     </form>
   )
 }
